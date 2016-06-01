@@ -1,0 +1,49 @@
+<head>
+  <meta charset="utf-8">
+  <title>Travel App Indie Project</title>
+  <link rel="stylesheet" href="bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css">
+</head>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/moment/min/moment.min.js"></script>
+  <script src="bower_components/combodate/src/combodate.js"></script>
+<body>
+
+  {% extends 'base.html' %}
+  {% block content %}
+
+    {%if logged_in%}
+    <form action="">
+      Enter a location: <input name="location" type="text" placeholder="location" value=""></input>
+      <input type="submit" value="Submit"></input></br>
+    </form>
+      Choose Start Date: <input type="text" id="dateStart" data-format="DD-MM-YYYY" data-template="D MMM YYYY" name="date" value="09-01-2013">
+      Choose End Date: <input type="text" id="dateEnd" data-format="DD-MM-YYYY" data-template="D MMM YYYY" name="date" value="09-01-2013">
+    {% endif %}
+
+  {% if location %}
+
+  <h4>Here are meetups for {{location}}</h4>
+
+  <ul>
+    {% for meetup in meetups %}
+    <li>
+      Location:{{meetup.venue.city}}
+    , time:{{meetup.time}}
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% endif %}
+
+  {% endblock %}
+
+</body>
+<script>
+$(function(){
+    $('#dateStart').combodate();
+});
+
+$(function(){
+    $('#dateEnd').combodate();
+});
+</script>

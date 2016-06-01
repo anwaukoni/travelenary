@@ -1,0 +1,23 @@
+<html>
+<head>
+
+</head>
+<body>
+
+
+  <h1>Hi {{name}}</h1>
+  Second Page
+
+
+  {% if logged_in %}
+  <button>Log out</button>
+  {% else %}
+  <button>Log in</button>
+  {% endif %}
+
+
+{% block content %}
+HAHAHAHA
+{% endblock %}
+</body>
+</html>
