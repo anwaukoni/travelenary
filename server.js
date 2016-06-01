@@ -13,50 +13,56 @@ nunjucks.configure('views',{
 
 
 var meetupApiKey= '45482a6536f5068326310786f80351c';
-var meetupURL = 'https://api.meetup.com/2/open_events';
 var geoCodeApiKey = "AIzaSyDkLWiFHDZ-kgcUKAMkv0wNAiieQZi21ls";
-var myUrl = "https://api.meetup.com/2/open_events/?&key=" + meetupApiKey + "&sign=true&photo-host=public&zip=90001&country=UnitedStates&page=100&category=1,5,10,11,20,21,23,30,31,32";
-// var state = req.query.state;
-// var city = req.query.city;
+var meetupURL = "https://api.meetup.com/2/open_events/?&key=" + meetupApiKey + "&sign=true&photo-host=public&zip=90001&country=UnitedStates&page=100&category=1,5,10,11,20,21,23,30,31,32";
 var zipCode;
 
 // var myFilters = {
 //   //Create userfilters for location
-//   cityState: request( 'https://maps.googleapis.com/maps/api/geocode/json?address='+state,'+'+ city +'&key='+'geoCodeApiKey', function(){}),
-//
-//
-//   //Create userfilter for Time period
+//   cityState: request( , function(){}),
+// //
+// //
+// //   //Create userfilter for Time period
 //   startTime: function()
 //
 // }
 
-app.get('/', function(req,res) {
+app.get('/', function(req,res,next) {
   //if the url has ?location=dallas
   // "dallas" will now be stored in `location`; else `location` should be
   // undefined.
 
   // var startTime = req.query.time;
-
   var location = req.query.location;
+  var state = req.query.state;
+  var city = req.query.city;
+  var googleGeoCode = 'https://maps.googleapis.com/maps/api/geocode/json?address='+state+','+'+'+ city +'&key='+geoCodeApiKey;
 
-  var meetups = [];
+  if (city && state){
+    request(googleGeoCode, function(error,response,body){
+      console.log(body);
+
+    });
+  }
+
 
   if (location){
-    request(myUrl,  function(error,response,html){
+    request(meetupURL,  function(error,response,html){
 
+      var meetups = [];
       var events = JSON.parse(html);
 
       for(var i = 0; i < events.results.length; i++){
         meetups.push(events.results[i]);
       }
 
-      console.log(meetups);
-      res.render('index.html', {name:"Gus", logged_in: true, meetups: meetups, location:location});
+
+      res.render('index.html', {name:"Gus", logged_in: true, meetups: meetups, location:location, state: state, city: city});
 
     });
 
   }else{
-    res.render('index.html', {name:"Gus", logged_in: true, meetups: meetups,location:location});
+    res.render('index.html', {name:"Gus", logged_in: true, meetups: meetups,location:location, state:state, city:city});
   }
   //Once we know the location, the template wants to tell the user his chosen
   // location, so we send it in to the dictionary.
