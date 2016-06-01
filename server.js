@@ -35,10 +35,13 @@ var zipCode;
 function middlewareCity(req,res,next){
   var state = req.query.state;
   var city = req.query.city;
-  var googleGeoCode = 'https://maps.googleapis.com/maps/api/geocode/json?address='+state+','+'+'+ city +'&key='+geoCodeApiKey;
-  // var client = request.createClient(googleGeoCode);
+  //var googleGeoCode = 'https://maps.googleapis.com/maps/api/geocode/json?address='+state+','+'+'+ city +'&key='+geoCodeApiKey;
 
-  if (city && state){
+  if (city !== undefined && state !== undefined){
+    var googleGeoCode = 'https://maps.googleapis.com/maps/api/geocode/json?address={state},+{city}&key={geoCodeApiKey}';
+    googleGeoCode = googleGeoCode.format({state:state, city: city, geoCodeApiKey: geoCodeApiKey});
+    // googleGeoCode = format(googleGeoCode, {state:state, city: city, geoCodeApiKey: geoCodeApiKey});
+
     request(googleGeoCode, function(error,response,body){
       if (error) throw error;
 
@@ -56,9 +59,6 @@ function middlewareCity(req,res,next){
         req.user_location = location;
 
       }
-
-
-
       next();
 
 
@@ -68,29 +68,30 @@ function middlewareCity(req,res,next){
 }
 function middlewareZip(req,res,next){
 
-  // var client = request.createClient(googleGeoCode);
-
+  var lngtd = req.user_location.lng;
+  var latd = req.user_location.lat;
   if (req.user_location){
-    var googleGeoCode = 'https://maps.googleapis.com/maps/api/geocode/json?address='+state+','+'+'+ city +'&key='+geoCodeApiKey;
+    var googleGeoCode = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={latd},{lngtd}&key={geoCodeApiKey}';
+    googleGeoCode = googleGeoCode.format({lngtd: lngtd, latd: latd, geoCodeApiKey: geoCodeApiKey});
     request(googleGeoCode, function(error,response,body){
       if (error) throw error;
-
       var data = JSON.parse(body);
-
-
       var results = data.results;
-
       if (results.length > 0)
       {
         var result = results[0];
-
-        var location = result.geometry.location;
-        console.log(JSON.stringify(location, null, 4));
-        req.user_zip = zip;
+        // console.log(result.address_components);
+        for(var i = 0; i < result.address_components.length; i++){
+          // console.log(result.address_components[i].types[0]);
+          if (result.address_components[i].types[0] === "postal_code"){
+            console.log(result.address_components[i]);
+          }
+        }
+        // var zip = result.geometry.location;
+        // console.log(JSON.stringify(location, null, 4));
+        // req.user_zip = zip;
 
       }
-
-
 
       next();
 
@@ -106,19 +107,16 @@ app.get('/',middlewareCity, middlewareZip, function(req,res, next) {
   // "dallas" will now be stored in `location`; else `location` should be
   // undefined.
   // var startTime = req.query.time;
-
   if (req.user_zip !== undefined){
     var meetupURL = meetupURLTemplate.format({zipcode: zipcode});
-    request(meetupURL,  function(error,response,html){
+    request(meetupURL,  function(error,response,body){
 
       var meetups = [];
-      var events = JSON.parse(html);
+      var events = JSON.parse(body);
 
       for(var i = 0; i < events.results.length; i++){
         meetups.push(events.results[i]);
       }
-
-
       res.render('index.html', {name:"Gus", logged_in: true, meetups: meetups, location:undefined});
 
     });

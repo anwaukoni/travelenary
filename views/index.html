@@ -13,18 +13,19 @@
 
     {%if logged_in%}
     <form action="">
-      Enter a location: <input name="location" type="text" placeholder="location" value=""></input><br/>
-      Enter a location: <input name="state" type="text" placeholder="State" value=""></input>
-                     <input name="city" type="text" placeholder="city" value=""></input>
+      <p>
+        Enter a location: <input name="state" type="text" placeholder="State" value=""></input>
+                        <input name="city" type="text" placeholder="city" value=""></input>
       <input type="submit" value="Submit"></input></br>
+    </p>
     </form>
       Choose Start Date: <input type="text" id="dateStart" data-format="DD-MM-YYYY" data-template="D MMM YYYY" name="date" value="09-01-2013">
       Choose End Date: <input type="text" id="dateEnd" data-format="DD-MM-YYYY" data-template="D MMM YYYY" name="date" value="09-01-2013">
     {% endif %}
 
-  {% if location %}
+  {% if city and state %}
 
-  <h4>Here are meetups for {{location}}</h4>
+  <h4>Here are meetups for {{city}}</h4>
 
   <ul>
     {% for meetup in meetups %}
