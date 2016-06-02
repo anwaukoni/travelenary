@@ -106,8 +106,10 @@ app.get('/',middlewareCity, middlewareZip, function(req,res, next) {
   // var startTime = req.query.time;
 
 
-  var start = req.query.startDate;
+  var startDate = req.query.startDate;
   var endDate = req.query.endDate;
+  console.log("this is start", typeof startDate);
+  console.log("this is end", typeof endDate);
 
   // console.log('app.get("/")');
   if (req.userZip !== undefined){
