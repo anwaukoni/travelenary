@@ -3,7 +3,9 @@
 var request = require('request');
 var express = require('express');
 var nunjucks = require('nunjucks');
-var format = require('string-format')
+var format = require('string-format');
+var moment = require('moment');
+moment().format();
 format.extend(String.prototype)
 
 
@@ -106,29 +108,34 @@ app.get('/',middlewareCity, middlewareZip, function(req,res, next) {
   // var startTime = req.query.time;
 
 
-  var startDate = req.query.startDate;
-  var endDate = req.query.endDate;
-  console.log("this is start", typeof startDate);
-  console.log("this is end", typeof endDate);
 
+  //
   // console.log('app.get("/")');
   if (req.userZip !== undefined){
+    var startDate = moment(req.query.startDate).format("x");
+    var endDate = moment(req.query.endDate).format("x");
+    console.log("this is start", startDate);
+   console.log("this is end", endDate);
+
     var userZip = req.userZip;
 
     var meetupURL = meetupURLTemplate.format({userZip: userZip});
     request(meetupURL,  function(error,response,body){
       var meetups = [];
+      var allEvents= [];
       var betweenDate= [];
       var events = JSON.parse(body);
-
       for(var i = 0; i < events.results.length; i++){
         var meetup = events.results[i];
-        meetups.push(meetup);
-
+        allEvents.push(meetup);
+        if (startDate < meetup.time && endDate > meetup.time){
+          meetups.push(meetup);
+        }
 
       }
 
-      // console.log(meetups);
+      console.log("this is allevents",allEvents.length);
+      console.log("this is meetups",meetups.length);
       res.render('index.html', {name:"Gus", logged_in: true, meetups: meetups, city: req.query.city, state: req.query.state, has_results: true});
 
     });
@@ -144,12 +151,3 @@ app.get('/',middlewareCity, middlewareZip, function(req,res, next) {
 });
 
 app.listen(3000);
-
-///use meetups API to retrieve a non-empty list for `meetups`
-///then, filter it based on time.
-// var meetups = [ {location: "44street", time: '4pm, June 1st'}
-//   , {location: "44street", time: '5pm, June 1st'}
-//   , {location: "44street", time: '6pm, June 2st'}
-//   , {location: "44street", time: '2pm, June 3st'}
-//   , {location: "44street", time: '4pm, June 1st'}
-// ];
